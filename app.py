@@ -13,14 +13,35 @@ warnings.filterwarnings("ignore")
 app = Flask(__name__, template_folder="templates")
 
 # -------------------------------------------------------
-# Load all models and files at startup
+# Download model from Google Drive if not present
 # -------------------------------------------------------
 BASE_DIR  = os.path.dirname(os.path.abspath(__file__))
 MODEL_DIR = os.path.join(BASE_DIR, "models")
+os.makedirs(MODEL_DIR, exist_ok=True)
 
+RF_MODEL_PATH = os.path.join(MODEL_DIR, "random_forest_model.pkl")
+RF_MODEL_GDRIVE_ID = "1UVuZd1qxsksb0QAxKAI-g-PlazbSXWyX"
+
+if not os.path.exists(RF_MODEL_PATH):
+    print("⬇️  Downloading RF model from Google Drive...")
+    try:
+        import gdown
+        gdown.download(
+            f"https://drive.google.com/uc?id={RF_MODEL_GDRIVE_ID}",
+            RF_MODEL_PATH,
+            quiet=False
+        )
+        print("✅ RF model downloaded successfully!")
+    except Exception as e:
+        print(f"❌ Failed to download RF model: {e}")
+        raise RuntimeError(f"Could not download random_forest_model.pkl: {e}")
+
+# -------------------------------------------------------
+# Load all models and files at startup
+# -------------------------------------------------------
 print("🚀 Loading models...")
 
-with open(os.path.join(MODEL_DIR, "random_forest_model.pkl"), "rb") as f:
+with open(RF_MODEL_PATH, "rb") as f:
     rf_model = pickle.load(f)
 print("✅ RF model loaded!")
 
