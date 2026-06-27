@@ -8,3 +8,6 @@ __pycache__/
 *.pyo
 .env
 *.DS_Storemodels/random_forest_model.pkl
+models/random_forest_model.pkl
+models/lstm_model.keras
+models/xgboost_model.pkl
