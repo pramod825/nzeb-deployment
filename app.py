@@ -20,19 +20,28 @@ MODEL_DIR = os.path.join(BASE_DIR, "models")
 
 def download_rf_model():
     """Download RF model from Google Drive if not exists"""
-    rf_path = os.path.join(MODEL_DIR, "rf_model.pkl")
+    # Try both possible filenames
+    rf_path1 = os.path.join(MODEL_DIR, "rf_model.pkl")
+    rf_path2 = os.path.join(
+        MODEL_DIR, "random_forest_model.pkl"
+    )
 
-    if os.path.exists(rf_path):
+    # Check if already exists
+    if os.path.exists(rf_path1):
         print("✅ RF model already exists!")
-        return rf_path
+        return rf_path1
+    if os.path.exists(rf_path2):
+        print("✅ RF model already exists!")
+        return rf_path2
 
+    # Download from Google Drive
     print("⬇️  Downloading RF model from Google Drive...")
     import gdown
-    file_id  = "1kfbtbv2VVou-XjOq7bVq8-GJRVS_BmEF"
-    url      = f"https://drive.google.com/uc?id={file_id}"
-    gdown.download(url, rf_path, quiet=False)
-    print("✅ RF model downloaded!")
-    return rf_path
+    file_id = "1kfbtbv2VVou-XjOq7bVq8-GJRVS_BmEF"
+    url     = f"https://drive.google.com/uc?id={file_id}"
+    gdown.download(url, rf_path1, quiet=False)
+    print("✅ RF model downloaded successfully!")
+    return rf_path1
 
 # -------------------------------------------------------
 # Load all models and files at startup
