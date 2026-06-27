@@ -678,8 +678,8 @@ async function predict() {
         if (!r.success) { alert("Error: " + r.error); return; }
 
         document.getElementById("rf_pred").textContent    = r.rf_pred       + " kWh/m²";
-        document.getElementById("bipv_wall").textContent  = r.bipv_wall_kwh_m2 + " kWh/m²";
-        document.getElementById("bipv_roof").textContent  = r.bipv_roof_kwh_m2 + " kWh/m²";
+        document.getElementById("bipv_wall").textContent  = (r.bipv_kwh_m2 * 0.75).toFixed(6) + " kWh/m²";
+        document.getElementById("bipv_roof").textContent  = (r.bipv_kwh_m2 * 0.25).toFixed(6) + " kWh/m²";
         document.getElementById("bipv").textContent       = r.bipv_kwh_m2   + " kWh/m²";
         document.getElementById("net_energy").textContent = r.net_energy     + " kWh/m²";
         document.getElementById("energy_rating").innerHTML = `<span style="font-size:11px">${r.energy_rating}</span>`;
