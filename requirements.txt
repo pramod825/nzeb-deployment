@@ -7,3 +7,4 @@ tensorflow==2.13.0
 pvlib==0.10.2
 gunicorn==21.2.0
 gdown==4.7.1
+setuptools==68.0.0
