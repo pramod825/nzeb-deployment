@@ -1,0 +1,110 @@
+{
+  "Delhi": {
+    "lat": 28.6139,
+    "lon": 77.209,
+    "altitude": 216,
+    "timezone": "Asia/Kolkata",
+    "climate_zone": 1,
+    "zone_name": "Hot & Dry",
+    "state": "Delhi"
+  },
+  "Mumbai": {
+    "lat": 19.076,
+    "lon": 72.8777,
+    "altitude": 14,
+    "timezone": "Asia/Kolkata",
+    "climate_zone": 2,
+    "zone_name": "Warm & Humid",
+    "state": "Maharashtra"
+  },
+  "Bengaluru": {
+    "lat": 12.9716,
+    "lon": 77.5946,
+    "altitude": 920,
+    "timezone": "Asia/Kolkata",
+    "climate_zone": 3,
+    "zone_name": "Temperate",
+    "state": "Karnataka"
+  },
+  "Chennai": {
+    "lat": 13.0827,
+    "lon": 80.2707,
+    "altitude": 6,
+    "timezone": "Asia/Kolkata",
+    "climate_zone": 2,
+    "zone_name": "Warm & Humid",
+    "state": "Tamil Nadu"
+  },
+  "Hyderabad": {
+    "lat": 17.385,
+    "lon": 78.4867,
+    "altitude": 542,
+    "timezone": "Asia/Kolkata",
+    "climate_zone": 1,
+    "zone_name": "Hot & Dry",
+    "state": "Telangana"
+  },
+  "Kolkata": {
+    "lat": 22.5726,
+    "lon": 88.3639,
+    "altitude": 9,
+    "timezone": "Asia/Kolkata",
+    "climate_zone": 2,
+    "zone_name": "Warm & Humid",
+    "state": "West Bengal"
+  },
+  "Pune": {
+    "lat": 18.5204,
+    "lon": 73.8567,
+    "altitude": 560,
+    "timezone": "Asia/Kolkata",
+    "climate_zone": 3,
+    "zone_name": "Temperate",
+    "state": "Maharashtra"
+  },
+  "Ahmedabad": {
+    "lat": 23.0225,
+    "lon": 72.5714,
+    "altitude": 53,
+    "timezone": "Asia/Kolkata",
+    "climate_zone": 4,
+    "zone_name": "Composite",
+    "state": "Gujarat"
+  },
+  "Jaipur": {
+    "lat": 26.9124,
+    "lon": 75.7873,
+    "altitude": 431,
+    "timezone": "Asia/Kolkata",
+    "climate_zone": 1,
+    "zone_name": "Hot & Dry",
+    "state": "Rajasthan"
+  },
+  "Lucknow": {
+    "lat": 26.8467,
+    "lon": 80.9462,
+    "altitude": 123,
+    "timezone": "Asia/Kolkata",
+    "climate_zone": 4,
+    "zone_name": "Composite",
+    "state": "Uttar Pradesh"
+  },
+  "Guwahati": {
+    "lat": 26.1445,
+    "lon": 91.7362,
+    "altitude": 55,
+    "timezone": "Asia/Kolkata",
+    "climate_zone": 2,
+    "zone_name": "Warm & Humid",
+    "state": "Assam"
+  },
+  "Chandigarh": {
+    "lat": 30.7333,
+    "lon": 76.7794,
+    "altitude": 321,
+    "timezone": "Asia/Kolkata",
+    "climate_zone": 1,
+    "zone_name": "Composite",
+    "state": "Punjab/Haryana"
+  }
+}
