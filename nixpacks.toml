@@ -1,0 +1,5 @@
+[phases.setup]
+nixPkgs = ["python311", "gcc"]
+
+[start]
+cmd = "gunicorn app:app --workers 1 --timeout 120"
