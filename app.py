@@ -45,7 +45,7 @@ with open(RF_MODEL_PATH, "rb") as f:
     rf_model = pickle.load(f)
 print("✅ RF model loaded!")
 
-with open(os.path.join(MODEL_DIR, "scaler (4).pkl"), "rb") as f:
+with open(os.path.join(MODEL_DIR, "scaler.pkl"), "rb") as f:
     scaler = pickle.load(f)
 print("✅ Scaler loaded!")
 
