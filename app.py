@@ -20,13 +20,9 @@ MODEL_DIR = os.path.join(BASE_DIR, "models")
 
 def download_rf_model():
     """Download RF model from Google Drive if not exists"""
-    # Try both possible filenames
     rf_path1 = os.path.join(MODEL_DIR, "rf_model.pkl")
-    rf_path2 = os.path.join(
-        MODEL_DIR, "random_forest_model.pkl"
-    )
+    rf_path2 = os.path.join(MODEL_DIR, "random_forest_model.pkl")
 
-    # Check if already exists
     if os.path.exists(rf_path1):
         print("✅ RF model already exists!")
         return rf_path1
@@ -34,7 +30,6 @@ def download_rf_model():
         print("✅ RF model already exists!")
         return rf_path2
 
-    # Download from Google Drive
     print("⬇️  Downloading RF model from Google Drive...")
     import gdown
     file_id = "1kfbtbv2VVou-XjOq7bVq8-GJRVS_BmEF"
@@ -44,56 +39,66 @@ def download_rf_model():
     return rf_path1
 
 # -------------------------------------------------------
-# Load all models and files at startup
+# ✅ NEW: Load tiny JSON files at startup (safe, small)
 # -------------------------------------------------------
-print("🚀 Loading models...")
-
-# Download & Load RF model
-rf_path = download_rf_model()
-with open(rf_path, "rb") as f:
-    rf_model = pickle.load(f)
-print("✅ RF model loaded!")
-
-# Load XGBoost model
-with open(os.path.join(MODEL_DIR, "xgb_model.pkl"), "rb") as f:
-    xgb_model = pickle.load(f)
-print("✅ XGBoost model loaded!")
-
-# Load Scaler
-with open(os.path.join(MODEL_DIR, "scaler.pkl"), "rb") as f:
-    scaler = pickle.load(f)
-print("✅ Scaler loaded!")
-
-# Load Feature columns
-with open(os.path.join(MODEL_DIR, "feature_cols.pkl"), "rb") as f:
-    feature_cols = pickle.load(f)
-print(f"✅ Feature cols loaded! ({len(feature_cols)} features)")
-
-# Load Cities info
 with open(os.path.join(MODEL_DIR, "cities.json"), "r") as f:
     cities = json.load(f)
 print(f"✅ Cities loaded! ({len(cities)} cities)")
 
-# Load Building parameters
 with open(os.path.join(MODEL_DIR, "building.json"), "r") as f:
     building = json.load(f)
 print("✅ Building params loaded!")
 
-# Load City encoding
 with open(os.path.join(MODEL_DIR, "city_encoding.json"), "r") as f:
     city_encoding = json.load(f)
 print("✅ City encoding loaded!")
 
-# Load LSTM model
-from tensorflow.keras.models import load_model
-lstm_model = load_model(
+# -------------------------------------------------------
+# ✅ NEW: Lazy model loader — loads only on first request
+# -------------------------------------------------------
+_models = {}
+
+def get_models():
+    if _models:
+        return _models  # already loaded, return immediately
+
+    print("🚀 Loading models on first request...")
+
+    # Download & load RF model
+    rf_path = download_rf_model()
+    with open(rf_path, "rb") as f:
+        _models["rf"] = pickle.load(f)
+    print("✅ RF model loaded!")
+
+    # Load XGBoost model
+    with open(os.path.join(MODEL_DIR, "xgb_model.pkl"), "rb") as f:
+        _models["xgb"] = pickle.load(f)
+    print("✅ XGBoost model loaded!")
+
+    # Load Scaler
+    with open(os.path.join(MODEL_DIR, "scaler.pkl"), "rb") as f:
+        _models["scaler"] = pickle.load(f)
+    print("✅ Scaler loaded!")
+
+    # Load Feature columns
+    with open(os.path.join(MODEL_DIR, "feature_cols.pkl"), "rb") as f:
+        _models["feature_cols"] = pickle.load(f)
+    print(f"✅ Feature cols loaded!")
+
+    # Load LSTM model
+   # DELETE these lines
+    from tensorflow.keras.models import load_model  # type: ignore
+    lstm_model = load_model(
     os.path.join(MODEL_DIR, "lstm_model.keras")
 )
-print("✅ LSTM model loaded!")
-print("🎉 All models loaded successfully!")
+    print("✅ LSTM model loaded!")
+
+    print("🎉 All models loaded successfully!")
+    return _models
+
 
 # -------------------------------------------------------
-# Helper function - Calculate all features
+# Helper function - Calculate all features (UNCHANGED)
 # -------------------------------------------------------
 def calculate_features(
     city, month, day, hour,
@@ -103,7 +108,6 @@ def calculate_features(
 ):
     info = cities[city]
 
-    # Solar position
     site = pvlib.location.Location(
         latitude  = info["lat"],
         longitude = info["lon"],
@@ -118,33 +122,20 @@ def calculate_features(
         tz=info["timezone"]
     )
 
-    solar_pos  = site.get_solarposition(
-        pd.DatetimeIndex([dt])
-    )
-    solar_alt  = float(
-        solar_pos["apparent_elevation"].iloc[0]
-    )
-    solar_az   = float(
-        solar_pos["azimuth"].iloc[0]
-    )
-    solar_zen  = float(
-        solar_pos["apparent_zenith"].iloc[0]
-    )
+    solar_pos  = site.get_solarposition(pd.DatetimeIndex([dt]))
+    solar_alt  = float(solar_pos["apparent_elevation"].iloc[0])
+    solar_az   = float(solar_pos["azimuth"].iloc[0])
+    solar_zen  = float(solar_pos["apparent_zenith"].iloc[0])
     is_daytime = 1 if solar_alt > 0 else 0
 
-    # Facade radiation
     ghi  = float(solar_radiation)
     disc = pvlib.irradiance.disc(
         np.array([ghi]),
         np.array([solar_zen]),
         pd.DatetimeIndex([dt])
     )
-    dni = max(0.0, float(
-        np.array(disc["dni"]).flatten()[0]
-    ))
-    dhi = max(0.0, ghi - dni * np.cos(
-        np.radians(solar_zen)
-    ))
+    dni = max(0.0, float(np.array(disc["dni"]).flatten()[0]))
+    dhi = max(0.0, ghi - dni * np.cos(np.radians(solar_zen)))
 
     walls = {
         "north": {"tilt": 90, "azimuth": 0},
@@ -165,93 +156,57 @@ def calculate_features(
             dhi             = np.array([dhi]),
             model           = "isotropic"
         )
-        val = float(np.array(
-            poa["poa_global"]
-        ).flatten()[0])
-        facade_radiation[wall_name] = max(
-            0.0, float(np.nan_to_num(val))
-        )
+        val = float(np.array(poa["poa_global"]).flatten()[0])
+        facade_radiation[wall_name] = max(0.0, float(np.nan_to_num(val)))
 
-    # BIPV generation
     eff = float(building["bipv_efficiency"])
     pr  = float(building["bipv_pr"])
 
-    bipv_south_w = (
-        facade_radiation["south"] *
-        float(building["bipv_area_south"]) *
-        eff * pr * is_daytime
-    )
-    bipv_east_w = (
-        facade_radiation["east"] *
-        float(building["bipv_area_east"]) *
-        eff * pr * is_daytime
-    )
-    bipv_west_w = (
-        facade_radiation["west"] *
-        float(building["bipv_area_west"]) *
-        eff * pr * is_daytime
-    )
+    bipv_south_w = facade_radiation["south"] * float(building["bipv_area_south"]) * eff * pr * is_daytime
+    bipv_east_w  = facade_radiation["east"]  * float(building["bipv_area_east"])  * eff * pr * is_daytime
+    bipv_west_w  = facade_radiation["west"]  * float(building["bipv_area_west"])  * eff * pr * is_daytime
     bipv_total_w   = bipv_south_w + bipv_east_w + bipv_west_w
     bipv_south_kwh = bipv_south_w / 1000
     bipv_east_kwh  = bipv_east_w  / 1000
     bipv_west_kwh  = bipv_west_w  / 1000
     bipv_total_kwh = bipv_total_w / 1000
-    bipv_m2        = bipv_total_kwh / float(
-        building["total_area"]
-    )
+    bipv_m2        = bipv_total_kwh / float(building["total_area"])
 
-    # Date features
     date_obj    = datetime.date(2024, month, day)
     day_of_week = date_obj.weekday()
     day_of_year = date_obj.timetuple().tm_yday
     is_weekend  = 1 if day_of_week >= 5 else 0
     is_peak     = 1 if 9 <= hour <= 18 else 0
 
-    # Thermal features
     cdd        = max(0.0, temperature - 24)
     hdd        = max(0.0, 18 - temperature)
-    discomfort = (0.4 * (temperature +
-                  0.99 * humidity) + 4.9)
-    heat_idx   = (temperature + 0.33 *
-                  (humidity / 100 * 6.105 *
-                  np.exp(17.27 * temperature /
-                  (237.7 + temperature))) - 4.0)
+    discomfort = (0.4 * (temperature + 0.99 * humidity) + 4.9)
+    heat_idx   = (temperature + 0.33 * (humidity / 100 * 6.105 *
+                  np.exp(17.27 * temperature / (237.7 + temperature))) - 4.0)
 
     total_facade = sum(facade_radiation.values())
-    rad_ratio    = (
-        total_facade / solar_radiation
-        if solar_radiation > 0 else 0
-    )
+    rad_ratio    = (total_facade / solar_radiation if solar_radiation > 0 else 0)
 
     solar_heat_gain = (
         float(building["shgc_south"]) *
-        (float(building["glass_area_north"]) +
-         float(building["glass_area_south"]) +
-         float(building["glass_area_east"])  +
-         float(building["glass_area_west"])) *
-        solar_radiation /
-        float(building["total_area"])
+        (float(building["glass_area_north"]) + float(building["glass_area_south"]) +
+         float(building["glass_area_east"])  + float(building["glass_area_west"])) *
+        solar_radiation / float(building["total_area"])
     )
 
     envelope_loss = (
         float(building["u_wall"]) *
-        (float(building["wall_area_north"]) +
-         float(building["wall_area_south"]) +
-         float(building["wall_area_east"])  +
-         float(building["wall_area_west"])) *
-        abs(temperature - 22) /
-        float(building["total_area"])
+        (float(building["wall_area_north"]) + float(building["wall_area_south"]) +
+         float(building["wall_area_east"])  + float(building["wall_area_west"])) *
+        abs(temperature - 22) / float(building["total_area"])
     )
 
-    thermal_comfort = 1 if (
-        20 <= temperature <= 26 and
-        30 <= humidity <= 60
-    ) else 0
+    thermal_comfort = 1 if (20 <= temperature <= 26 and 30 <= humidity <= 60) else 0
 
     season = (
-        1 if month in [3,4,5]  else
+        1 if month in [3,4,5]   else
         2 if month in [6,7,8,9] else
-        3 if month in [10,11]  else 4
+        3 if month in [10,11]   else 4
     )
 
     city_encoded = city_encoding[city]
@@ -323,15 +278,20 @@ def calculate_features(
 # -------------------------------------------------------
 @app.route("/")
 def home():
-    return render_template(
-        "index.html",
-        cities=cities
-    )
+    return render_template("index.html", cities=cities)
 
 
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
+        # ✅ NEW: Get models lazily (loads on first request only)
+        models       = get_models()
+        rf_model     = models["rf"]
+        xgb_model    = models["xgb"]
+        lstm_model   = models["lstm"]
+        scaler       = models["scaler"]
+        feature_cols = models["feature_cols"]
+
         data = request.json
 
         city            = data["city"]
@@ -344,7 +304,6 @@ def predict():
         wind_speed      = float(data["wind_speed"])
         cloud_cover     = float(data["cloud_cover"])
 
-        # Calculate features
         input_data, facade_rad, bipv_m2 = calculate_features(
             city, month, day, hour,
             temperature, humidity,
@@ -352,30 +311,18 @@ def predict():
             cloud_cover
         )
 
-        # Prepare input
         input_df     = pd.DataFrame([input_data])
         input_df     = input_df[feature_cols]
         input_scaled = scaler.transform(input_df)
 
-        # Predict all 3 models
-        rf_pred  = float(
-            rf_model.predict(input_scaled)[0]
-        )
-        xgb_pred = float(
-            xgb_model.predict(input_scaled)[0]
-        )
-        lstm_in  = input_scaled.reshape(
-            1, 1, input_scaled.shape[1]
-        )
-        lstm_pred = float(
-            lstm_model.predict(lstm_in, verbose=0)[0][0]
-        )
+        rf_pred  = float(rf_model.predict(input_scaled)[0])
+        xgb_pred = float(xgb_model.predict(input_scaled)[0])
+        lstm_in  = input_scaled.reshape(1, 1, input_scaled.shape[1])
+        lstm_pred = float(lstm_model.predict(lstm_in, verbose=0)[0][0])
 
-        # Ensemble of all 3
         ensemble   = (rf_pred + xgb_pred + lstm_pred) / 3
         net_energy = ensemble - bipv_m2
 
-        # Energy rating
         if ensemble < 0.05:
             rating = "Very Low Energy (Excellent NZEB)"
         elif ensemble < 0.10:
@@ -411,26 +358,18 @@ def predict():
         })
 
     except Exception as e:
-        return jsonify({
-            "success": False,
-            "error":   str(e)
-        })
+        return jsonify({"success": False, "error": str(e)})
 
 
 @app.route("/health")
 def health():
     return jsonify({
         "status":   "healthy",
-        "models":   "loaded",
+        "models":   "loaded" if _models else "not loaded yet",
         "cities":   len(cities),
-        "features": len(feature_cols)
     })
 
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(
-        host  = "0.0.0.0",
-        port  = port,
-        debug = False
-    )
+    app.run(host="0.0.0.0", port=port, debug=False)
