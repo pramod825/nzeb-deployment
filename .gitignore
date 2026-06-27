@@ -1,10 +1,10 @@
 # Large model files
 models/random_forest_model.pkl
-models/scaler (4).pkl
+models/rf_model.pkl
 
 # Python cache
 __pycache__/
 *.pyc
 *.pyo
 .env
-*.DS_Storemodels/random_forest_model.pkl
+*.DS_Store
