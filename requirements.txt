@@ -1,8 +1,7 @@
-flask==3.1.3
+flask
 numpy
 pandas
 scikit-learn==1.6.1
 xgboost
 pvlib
 gunicorn
-EOF
