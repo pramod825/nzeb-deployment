@@ -6,6 +6,7 @@ import pickle
 import json
 import pvlib
 import os
+import gdown
 import datetime
 import warnings
 warnings.filterwarnings("ignore")
@@ -13,99 +14,85 @@ warnings.filterwarnings("ignore")
 app = Flask(__name__, template_folder="templates")
 
 # -------------------------------------------------------
-# Download model from Google Drive if not present
+# Download models from Google Drive if not present
 # -------------------------------------------------------
 BASE_DIR  = os.path.dirname(os.path.abspath(__file__))
 MODEL_DIR = os.path.join(BASE_DIR, "models")
 os.makedirs(MODEL_DIR, exist_ok=True)
 
 RF_MODEL_PATH = os.path.join(MODEL_DIR, "random_forest_model.pkl")
-RF_MODEL_GDRIVE_ID = "1UVuZd1qxsksb0QAxKAI-g-PlazbSXWyX"
 
 if not os.path.exists(RF_MODEL_PATH):
-    print("⬇️  Downloading RF model from Google Drive...")
-    try:
-        import gdown
-        gdown.download(
-            f"https://drive.google.com/uc?id={RF_MODEL_GDRIVE_ID}",
-            RF_MODEL_PATH,
-            quiet=False
-        )
-        print("✅ RF model downloaded successfully!")
-    except Exception as e:
-        print(f"❌ Failed to download RF model: {e}")
-        raise RuntimeError(f"Could not download random_forest_model.pkl: {e}")
+    print("Downloading RF model from Google Drive...")
+    gdown.download(
+        "https://drive.google.com/uc?id=1UVuZd1qxsksb0QAxKAI-g-PlazbSXWyX",
+        RF_MODEL_PATH,
+        quiet=False
+    )
+    print("RF model downloaded!")
 
 # -------------------------------------------------------
 # Load all models and files at startup
 # -------------------------------------------------------
-print("🚀 Loading models...")
+print("Loading models...")
 
-with open(RF_MODEL_PATH, "rb") as f:
+with open(os.path.join(MODEL_DIR, "random_forest_model.pkl"), "rb") as f:
     rf_model = pickle.load(f)
-print("✅ RF model loaded!")
+print("RF model loaded!")
 
 with open(os.path.join(MODEL_DIR, "scaler.pkl"), "rb") as f:
     scaler = pickle.load(f)
-print("✅ Scaler loaded!")
+print("Scaler loaded!")
 
 with open(os.path.join(MODEL_DIR, "feature_cols.pkl"), "rb") as f:
     feature_cols = pickle.load(f)
-print(f"✅ Feature cols loaded! ({len(feature_cols)} features)")
+print(f"Feature cols loaded! ({len(feature_cols)} features)")
 
 with open(os.path.join(MODEL_DIR, "cities.json"), "r") as f:
     cities = json.load(f)
-print(f"✅ Cities loaded! ({len(cities)} cities)")
+print(f"Cities loaded! ({len(cities)} cities)")
 
 with open(os.path.join(MODEL_DIR, "building.json"), "r") as f:
     building = json.load(f)
-print("✅ Building params loaded!")
+print("Building params loaded!")
 
 with open(os.path.join(MODEL_DIR, "city_encoding.json"), "r") as f:
     city_encoding = json.load(f)
-print("✅ City encoding loaded!")
+print("City encoding loaded!")
 
-print("🎉 All models loaded successfully!")
+print("All models loaded successfully!")
 
 # -------------------------------------------------------
 # India climate zone lookup by lat/lon
 # -------------------------------------------------------
 def get_climate_zone(lat, lon):
-    """Simple climate zone estimation for Indian cities"""
     if lat > 28:
-        return 1  # Cold/Composite (North India)
+        return 1
     elif lat > 23:
-        return 2  # Composite (Central India)
+        return 2
     elif lon > 80 and lat < 20:
-        return 3  # Hot & Humid (Coastal/South-East)
+        return 3
     elif lon < 75:
-        return 4  # Hot & Dry (West India / Rajasthan)
+        return 4
     else:
-        return 2  # Default Composite
+        return 2
 
 def get_city_info(city_name, lat, lon):
-    """Get city info — use known cities or estimate for new ones"""
-    # Check if city exists in our database
     for known_city, info in cities.items():
         if known_city.lower() == city_name.lower():
             return known_city, info, known_city
 
-    # For unknown cities, estimate based on lat/lon
     climate_zone = get_climate_zone(lat, lon)
-
-    # Find nearest known city encoding
     nearest_city = min(cities.keys(), key=lambda c: (
         (cities[c]["lat"] - lat)**2 + (cities[c]["lon"] - lon)**2
     ))
-    city_enc = city_encoding.get(nearest_city, 0)
 
-    # Estimate altitude from lat (rough India estimate)
     if lat > 25 and lon < 77:
-        altitude = 300  # North-West plains
+        altitude = 300
     elif lat > 20 and lon > 85:
-        altitude = 50   # Coastal East
+        altitude = 50
     else:
-        altitude = 200  # Default
+        altitude = 200
 
     estimated_info = {
         "lat": lat,
@@ -238,7 +225,6 @@ def get_monthly_data(city_name, lat, lon, temperature, humidity,
     energy_vals = []
     bipv_vals   = []
 
-    # Seasonal temp/solar adjustments for realism
     temp_adj   = [0,-2,-1,2,6,4,2,1,0,-1,-2,-1]
     solar_adj  = [0.7,0.8,0.9,1.0,1.0,0.8,0.7,0.7,0.85,0.9,0.8,0.7]
 
@@ -294,34 +280,31 @@ def predict():
         rf_pred      = float(rf_model.predict(input_scaled)[0])
         net_energy   = rf_pred - bipv_m2
 
-        # NZEB status & recommendation
         nzeb_pct = min(100, max(0, (bipv_m2 / rf_pred * 100) if rf_pred > 0 else 100))
         if net_energy <= 0:
-            recommendation = "✅ Net Zero Achieved! Your building generates enough solar energy to cover its consumption. Maintain current BIPV system and insulation."
+            recommendation = "Net Zero Achieved! Your building generates enough solar energy to cover its consumption."
             status_color   = "green"
         elif nzeb_pct >= 75:
-            recommendation = "🟡 Almost there! You are 75%+ toward Net Zero. Add 25% more BIPV panels on South/West facade to achieve Net Zero."
+            recommendation = "Almost there! You are 75%+ toward Net Zero. Add 25% more BIPV panels on South/West facade."
             status_color   = "yellow"
         elif nzeb_pct >= 50:
-            recommendation = "🟠 Halfway to Net Zero. Increase BIPV coverage, improve window glazing (low SHGC glass), and add roof insulation."
+            recommendation = "Halfway to Net Zero. Increase BIPV coverage, improve window glazing, and add roof insulation."
             status_color   = "orange"
         else:
-            recommendation = "🔴 High energy gap. Major improvements needed: expand BIPV system, upgrade HVAC efficiency, improve building envelope, and use smart controls."
+            recommendation = "High energy gap. Major improvements needed: expand BIPV system, upgrade HVAC efficiency."
             status_color   = "red"
 
-        # Energy rating
         if rf_pred < 0.05:
-            rating = "⭐⭐⭐⭐⭐ Excellent (Very Low Energy)"
+            rating = "Excellent (Very Low Energy)"
         elif rf_pred < 0.10:
-            rating = "⭐⭐⭐⭐ Good (Low Energy)"
+            rating = "Good (Low Energy)"
         elif rf_pred < 0.15:
-            rating = "⭐⭐⭐ Moderate Energy"
+            rating = "Moderate Energy"
         elif rf_pred < 0.20:
-            rating = "⭐⭐ High Energy"
+            rating = "High Energy"
         else:
-            rating = "⭐ Very High Energy"
+            rating = "Very High Energy"
 
-        # Monthly chart data
         monthly_energy, monthly_bipv = get_monthly_data(
             city_name, lat, lon, temperature, humidity,
             solar_radiation, wind_speed, cloud_cover
@@ -353,11 +336,9 @@ def predict():
 
 @app.route("/geocode", methods=["POST"])
 def geocode():
-    """Get lat/lon for any Indian city using a simple lookup or fallback"""
     try:
         city_name = request.json.get("city", "").strip()
 
-        # Check known cities first
         for known, info in cities.items():
             if known.lower() == city_name.lower():
                 return jsonify({
@@ -368,7 +349,6 @@ def geocode():
                     "state": info.get("state", "")
                 })
 
-        # Popular Indian cities fallback
         indian_cities = {
             "jodhpur":      (26.2389, 73.0243), "jaipur":     (26.9124, 75.7873),
             "udaipur":      (24.5854, 73.7125), "kota":       (25.2138, 75.8648),
@@ -396,7 +376,6 @@ def geocode():
             lat, lon = indian_cities[key]
             return jsonify({"success": True, "lat": lat, "lon": lon, "found": True})
 
-        # Default fallback — center of India
         return jsonify({
             "success": True, "lat": 22.0, "lon": 78.0,
             "found": False,
