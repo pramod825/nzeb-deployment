@@ -17,7 +17,17 @@ app = Flask(__name__, template_folder="templates")
 # -------------------------------------------------------
 BASE_DIR  = os.path.dirname(os.path.abspath(__file__))
 MODEL_DIR = os.path.join(BASE_DIR, "models")
+# Load JSON files at startup
+with open(os.path.join(MODEL_DIR, "cities.json"), "r") as f:
+    cities = json.load(f)
 
+with open(os.path.join(MODEL_DIR, "building.json"), "r") as f:
+    building = json.load(f)
+
+with open(os.path.join(MODEL_DIR, "city_encoding.json"), "r") as f:
+    city_encoding = json.load(f)
+
+print(f"✅ Cities loaded! ({len(cities)} cities)")
 rf_model = None
 scaler = None
 feature_cols = None
