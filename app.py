@@ -17,33 +17,34 @@ app = Flask(__name__, template_folder="templates")
 # -------------------------------------------------------
 BASE_DIR  = os.path.dirname(os.path.abspath(__file__))
 MODEL_DIR = os.path.join(BASE_DIR, "models")
-# Load JSON files at startup
+
+print("🚀 Loading models...")
+
+with open(os.path.join(MODEL_DIR, "random_forest_model.pkl"), "rb") as f:
+    rf_model = pickle.load(f)
+print("✅ RF model loaded!")
+
+with open(os.path.join(MODEL_DIR, "scaler (4).pkl"), "rb") as f:
+    scaler = pickle.load(f)
+print("✅ Scaler loaded!")
+
+with open(os.path.join(MODEL_DIR, "feature_cols.pkl"), "rb") as f:
+    feature_cols = pickle.load(f)
+print(f"✅ Feature cols loaded! ({len(feature_cols)} features)")
+
 with open(os.path.join(MODEL_DIR, "cities.json"), "r") as f:
     cities = json.load(f)
+print(f"✅ Cities loaded! ({len(cities)} cities)")
 
 with open(os.path.join(MODEL_DIR, "building.json"), "r") as f:
     building = json.load(f)
+print("✅ Building params loaded!")
 
 with open(os.path.join(MODEL_DIR, "city_encoding.json"), "r") as f:
     city_encoding = json.load(f)
+print("✅ City encoding loaded!")
 
-print(f"✅ Cities loaded! ({len(cities)} cities)")
-rf_model = None
-scaler = None
-feature_cols = None
-
-def load_models():
-    global rf_model, scaler, feature_cols
-    if rf_model is not None:
-        return
-    print("🚀 Loading models...")
-    with open(os.path.join(MODEL_DIR, "random_forest_model.pkl"), "rb") as f:
-        rf_model = pickle.load(f)
-    with open(os.path.join(MODEL_DIR, "scaler.pkl"), "rb") as f:
-        scaler = pickle.load(f)
-    with open(os.path.join(MODEL_DIR, "feature_cols.pkl"), "rb") as f:
-        feature_cols = pickle.load(f)
-    print("🎉 Models loaded!")
+print("🎉 All models loaded successfully!")
 
 # -------------------------------------------------------
 # India climate zone lookup by lat/lon
