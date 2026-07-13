@@ -53,7 +53,6 @@
         .stat-num{font-size:28px;font-weight:800;color:var(--primary)}
         .stat-label{font-size:12px;color:var(--muted);margin-top:2px}
 
-        /* Feature cards on home */
         .features{background:var(--dark2);padding:80px 40px}
         .section-title{text-align:center;margin-bottom:48px}
         .section-title h2{font-size:32px;font-weight:700;margin-bottom:8px}
@@ -65,7 +64,6 @@
         .feature-card h3{font-size:18px;font-weight:600;margin-bottom:10px}
         .feature-card p{color:var(--muted);font-size:14px;line-height:1.7}
 
-        /* Building image strip */
         .building-strip{padding:60px 40px;max-width:1200px;margin:0 auto}
         .building-strip h2{font-size:28px;font-weight:700;margin-bottom:8px;text-align:center}
         .building-strip p{color:var(--muted);text-align:center;margin-bottom:32px}
@@ -75,7 +73,7 @@
         .building-img:hover img{transform:scale(1.05)}
         .building-img-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.8));padding:16px 12px 10px;font-size:12px;color:#fff}
 
-        /* ===== SHARED SECTION STYLES ===== */
+        /* ===== SHARED ===== */
         .page-header{background:linear-gradient(135deg,var(--dark2),var(--dark));padding:48px 40px 32px;border-bottom:1px solid var(--border)}
         .page-header h1{font-size:32px;font-weight:700;margin-bottom:8px}
         .page-header p{color:var(--muted);font-size:15px}
@@ -124,6 +122,33 @@
         .chart-box{background:var(--dark3);border:1px solid var(--border);border-radius:12px;padding:16px}
         .chart-box h3{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:12px}
         .bipv-row{background:rgba(0,200,83,.05);border-radius:6px;padding:2px 6px}
+
+        /* ===== PANEL CALCULATOR ===== */
+        .panel-section{margin-top:20px;background:var(--dark3);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+        .panel-header{background:linear-gradient(135deg,rgba(0,200,83,.15),rgba(0,212,255,.1));border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;gap:10px}
+        .panel-header h3{font-size:14px;font-weight:700;color:var(--text);letter-spacing:.3px}
+        .panel-header .panel-badge{background:rgba(0,200,83,.2);border:1px solid rgba(0,200,83,.4);border-radius:12px;padding:2px 10px;font-size:11px;color:var(--green);font-weight:600}
+        .panel-body{padding:18px}
+        .panel-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+        .panel-kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center}
+        .panel-kpi-num{font-size:22px;font-weight:800;color:var(--primary);line-height:1.1}
+        .panel-kpi-label{font-size:10px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.4px}
+        .panel-breakdown{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+        .panel-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
+        .panel-box-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+        .panel-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px}
+        .panel-row:last-child{border-bottom:none}
+        .panel-row-val{font-weight:700;color:var(--primary)}
+        .panel-row-val.green{color:var(--green)}
+        .panel-row-val.orange{color:#ffa500}
+        .nzeb-result-bar{border-radius:8px;padding:12px 16px;font-size:13px;font-weight:600;text-align:center;margin-top:4px}
+        .nzeb-achieved{background:rgba(0,200,83,.12);border:1px solid rgba(0,200,83,.4);color:#00c853}
+        .nzeb-not-achieved{background:rgba(255,120,0,.1);border:1px solid rgba(255,120,0,.3);color:#ffa500}
+        .panel-direction-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+        .dir-chip{background:var(--dark3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;text-align:center}
+        .dir-chip-label{font-size:10px;color:var(--muted);margin-bottom:3px}
+        .dir-chip-val{font-size:15px;font-weight:700;color:var(--primary)}
+        .dir-chip-unit{font-size:9px;color:var(--muted)}
 
         /* ===== DATA PAGE ===== */
         .datasets-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:40px}
@@ -191,7 +216,7 @@
 
         @media(max-width:900px){
             .predict-grid,.features-grid,.datasets-grid,.results-charts,.about-grid,.metrics-hero{grid-template-columns:1fr}
-            .charts-row,.building-imgs,.solar-imgs,.nzeb-steps,.tech-grid{grid-template-columns:1fr 1fr}
+            .charts-row,.building-imgs,.solar-imgs,.nzeb-steps,.tech-grid,.panel-kpi-row,.panel-breakdown{grid-template-columns:1fr 1fr}
             nav{padding:0 20px}
             .page-content{padding:24px 20px}
             .hero-content{padding:0 20px}
@@ -274,9 +299,9 @@
                 <p>Compares energy demand vs BIPV generation to determine Net Zero achievement percentage with city-specific recommendations.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🌍</div>
-                <h3>Any Indian City</h3>
-                <p>Works for 30+ popular Indian cities with exact coordinates, and estimates climate zone for any other city based on geographic location.</p>
+                <div class="feature-icon">🔢</div>
+                <h3>Solar Panel Calculator</h3>
+                <p>Calculates exact number of rooftop and facade solar panels needed to achieve Net Zero. Gives South/East/West facade breakdown with total panel count.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">📊</div>
@@ -284,9 +309,9 @@
                 <p>Monthly energy vs BIPV bar charts, facade radiation comparison, and NZEB achievement gauge — all updating in real time per prediction.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🏗️</div>
-                <h3>5-Floor Office Building</h3>
-                <p>Modeled on a standard 5000m² commercial office building following BEE/ECBC Indian energy code with realistic wall, glass, and BIPV parameters.</p>
+                <div class="feature-icon">🌍</div>
+                <h3>Any Indian City</h3>
+                <p>Works for 30+ popular Indian cities with exact coordinates, and estimates climate zone for any other city based on geographic location.</p>
             </div>
         </div>
     </div>
@@ -296,7 +321,7 @@
 <div id="page-predict" class="page">
     <div class="page-header">
         <h1>🔮 Energy Prediction</h1>
-        <p>Enter climate data for any Indian city to predict NZEB status</p>
+        <p>Enter climate data for any Indian city to predict NZEB status and solar panel requirements</p>
     </div>
     <div class="page-content">
         <div class="predict-grid">
@@ -319,7 +344,7 @@
                 </div>
                 <div class="form-group">
                     <label>Hour (0–23)</label>
-                    <input type="number" id="hour" min="0" max="23" value="14">
+                   <input type="number" id="hour" min="0" max="23" value="12">
                 </div>
                 <div class="grid-2">
                     <div class="form-group">
@@ -345,6 +370,10 @@
                         <input type="number" id="cloud_cover" step="1" value="20">
                     </div>
                 </div>
+                <div class="form-group">
+                    <label>Building Floor Area (m²)</label>
+                    <input type="number" id="building_area" step="100" value="1000" min="100" max="100000">
+                </div>
                 <button class="predict-btn" id="predictBtn" onclick="predict()">🔮 Predict Energy</button>
             </div>
 
@@ -358,6 +387,7 @@
                     <p>Enter any Indian city and climate data,<br>then click Predict!</p>
                 </div>
                 <div id="pred-results">
+                    <!-- Energy Metrics + Gauge -->
                     <div class="metrics-grid">
                         <div class="metric-card">
                             <h3>⚡ Energy Metrics</h3>
@@ -365,7 +395,7 @@
                             <div class="metric-row bipv-row"><span>🏗️ Wall BIPV</span><span class="metric-val" id="bipv_wall">-</span></div>
                             <div class="metric-row bipv-row"><span>🏠 Rooftop BIPV</span><span class="metric-val" id="bipv_roof">-</span></div>
                             <div class="metric-row"><span>⚡ Total BIPV</span><span class="metric-val" id="bipv">-</span></div>
-                            <div class="metric-row"><span>Net Energy Gap</span><span class="metric-val" id="net_energy">-</span></div>
+                            <div class="metric-row"><span>Net Energy Gap (before panels)</span><span class="metric-val" id="net_energy">-</span></div>
                             <div class="metric-row"><span>BEE Rating</span><span id="energy_rating">-</span></div>
                         </div>
                         <div class="metric-card">
@@ -376,19 +406,116 @@
                                     <path id="gaugeArc" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#00d4ff" stroke-width="18" stroke-linecap="round" stroke-dasharray="0 251"/>
                                 </svg>
                                 <div class="gauge-pct" id="gaugePct">0%</div>
-                                <div class="gauge-label">toward Net Zero</div>
+                                <div class="gauge-label">current BIPV coverage</div>
                             </div>
                             <div style="text-align:center;margin-top:8px" id="nzeb_badge"></div>
                         </div>
                     </div>
+
+                    <!-- Recommendation -->
                     <div id="rec_box" class="rec-box rec-green"></div>
+
+                    <!-- ===== SOLAR PANEL CALCULATOR ===== -->
+                    <div class="panel-section" id="panelSection">
+                        <div class="panel-header">
+                            <span style="font-size:20px">🔢</span>
+                            <h3>Solar Panel Requirements to Achieve NZEB</h3>
+                            <span class="panel-badge" id="panelStatusBadge">Calculating...</span>
+                        </div>
+                        <div class="panel-body">
+                            <!-- KPI row -->
+                            <div class="panel-kpi-row">
+                                <div class="panel-kpi">
+                                    <div class="panel-kpi-num" id="totalPanels">-</div>
+                                    <div class="panel-kpi-label">Total Panels</div>
+                                </div>
+                                <div class="panel-kpi">
+                                    <div class="panel-kpi-num" id="totalArea">-</div>
+                                    <div class="panel-kpi-label">Total BIPV Area (m²)</div>
+                                </div>
+                                <div class="panel-kpi">
+                                    <div class="panel-kpi-num" id="energyGen">-</div>
+                                    <div class="panel-kpi-label">Energy Generated (kWh/yr)</div>
+                                </div>
+                                <div class="panel-kpi">
+                                    <div class="panel-kpi-num" id="solarHours">-</div>
+                                    <div class="panel-kpi-label">Peak Solar Hours/day</div>
+                                </div>
+                            </div>
+
+                            <!-- Rooftop + Facade breakdown -->
+                            <div class="panel-breakdown">
+                                <div class="panel-box">
+                                    <div class="panel-box-title">🏠 Rooftop Panels</div>
+                                    <div class="panel-row">
+                                        <span>Number of Panels</span>
+                                        <span class="panel-row-val" id="rooftopPanels">-</span>
+                                    </div>
+                                    <div class="panel-row">
+                                        <span>Area Required</span>
+                                        <span class="panel-row-val" id="rooftopArea">-</span>
+                                    </div>
+                                    <div class="panel-row">
+                                        <span>Energy Generated</span>
+                                        <span class="panel-row-val green" id="rooftopEnergy">-</span>
+                                    </div>
+                                    <div class="panel-row">
+                                        <span>Panel Rating</span>
+                                        <span class="panel-row-val">400W each</span>
+                                    </div>
+                                </div>
+                                <div class="panel-box">
+                                    <div class="panel-box-title">🏢 Facade Panels</div>
+                                    <div class="panel-row">
+                                        <span>Total Facade Panels</span>
+                                        <span class="panel-row-val" id="facadePanels">-</span>
+                                    </div>
+                                    <div class="panel-row">
+                                        <span>Area Required</span>
+                                        <span class="panel-row-val" id="facadeArea">-</span>
+                                    </div>
+                                    <div class="panel-row">
+                                        <span>Energy Generated</span>
+                                        <span class="panel-row-val green" id="facadeEnergy">-</span>
+                                    </div>
+                                    <div class="panel-row">
+                                        <span>Efficiency Factor</span>
+                                        <span class="panel-row-val orange">60% of rooftop</span>
+                                    </div>
+                                    <!-- Direction breakdown -->
+                                    <div class="panel-direction-grid">
+                                        <div class="dir-chip">
+                                            <div class="dir-chip-label">🌞 South</div>
+                                            <div class="dir-chip-val" id="southPanels">-</div>
+                                            <div class="dir-chip-unit">panels</div>
+                                        </div>
+                                        <div class="dir-chip">
+                                            <div class="dir-chip-label">🌅 East</div>
+                                            <div class="dir-chip-val" id="eastPanels">-</div>
+                                            <div class="dir-chip-unit">panels</div>
+                                        </div>
+                                        <div class="dir-chip">
+                                            <div class="dir-chip-label">🌇 West</div>
+                                            <div class="dir-chip-val" id="westPanels">-</div>
+                                            <div class="dir-chip-unit">panels</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- NZEB result -->
+                            <div id="nzebResultBar" class="nzeb-result-bar nzeb-not-achieved">-</div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
                     <div class="charts-row">
                         <div class="chart-box">
-                            <h3>☀️ Facade Radiation (W/m²)</h3>
+                           <h3>☀️ Facade Radiation W/m² (solar noon)</h3>
                             <canvas id="facadeChart" height="160"></canvas>
                         </div>
                         <div class="chart-box">
-                            <h3>📊 Monthly Energy vs BIPV</h3>
+                            <h3>📊 Monthly Energy vs BIPV (kWh/m²/yr)</h3>
                             <canvas id="monthlyChart" height="160"></canvas>
                         </div>
                     </div>
@@ -410,7 +537,7 @@
                 <div class="dataset-icon">🏗️</div>
                 <h3>I-BLEND Dataset</h3>
                 <div class="tag">Primary Dataset</div>
-                <p>Indian Building Level Energy Dataset from IIT Bombay. Contains hourly energy consumption data for commercial buildings across 12 Indian metrocities with climate and occupancy data.</p>
+                <p>Indian Building Level Energy Dataset from IIT Bombay. Contains hourly energy consumption data for commercial buildings across 12 Indian metrocities.</p>
                 <div class="dataset-stats">
                     <div class="ds-stat"><div class="ds-stat-num">525K+</div><div class="ds-stat-label">Records</div></div>
                     <div class="ds-stat"><div class="ds-stat-num">12</div><div class="ds-stat-label">Cities</div></div>
@@ -421,7 +548,7 @@
                 <div class="dataset-icon">🛰️</div>
                 <h3>NASA POWER</h3>
                 <div class="tag">Climate Data</div>
-                <p>NASA Prediction of Worldwide Energy Resources — satellite-derived meteorological data including solar radiation, temperature, humidity, wind speed, and cloud cover for all Indian cities.</p>
+                <p>NASA Prediction of Worldwide Energy Resources — satellite-derived meteorological data including solar radiation, temperature, humidity, wind speed, and cloud cover.</p>
                 <div class="dataset-stats">
                     <div class="ds-stat"><div class="ds-stat-num">40+</div><div class="ds-stat-label">Years Data</div></div>
                     <div class="ds-stat"><div class="ds-stat-num">0.5°</div><div class="ds-stat-label">Resolution</div></div>
@@ -432,7 +559,7 @@
                 <div class="dataset-icon">📋</div>
                 <h3>BEE / ECBC</h3>
                 <div class="tag">Energy Standards</div>
-                <p>Bureau of Energy Efficiency and Energy Conservation Building Code — Indian government standards for building envelope, HVAC, lighting, and BIPV specifications used for building parameter validation.</p>
+                <p>Bureau of Energy Efficiency and Energy Conservation Building Code — Indian government standards for building envelope, HVAC, lighting, and BIPV specifications.</p>
                 <div class="dataset-stats">
                     <div class="ds-stat"><div class="ds-stat-num">5</div><div class="ds-stat-label">Climate Zones</div></div>
                     <div class="ds-stat"><div class="ds-stat-num">BEE</div><div class="ds-stat-label">Star Rating</div></div>
@@ -440,7 +567,6 @@
                 </div>
             </div>
         </div>
-
         <div class="cities-table">
             <h3>🏙️ 12 Training Cities — Climate Zones</h3>
             <table>
@@ -495,7 +621,6 @@
                 <div class="metric-desc">5-Fold Cross Validation</div>
             </div>
         </div>
-
         <div class="results-charts">
             <div class="res-chart-card">
                 <h3>📊 Model Comparison — R² Score</h3>
@@ -508,7 +633,6 @@
                 <canvas id="cvChart" height="200"></canvas>
             </div>
         </div>
-
         <div class="results-charts">
             <div class="res-chart-card">
                 <h3>🌡️ City-wise R² Performance</h3>
@@ -521,7 +645,6 @@
                 <canvas id="featureChart" height="200"></canvas>
             </div>
         </div>
-
         <div class="cv-table">
             <h3>📋 Detailed CV Results — 5-Fold TimeSeriesSplit</h3>
             <table>
@@ -554,7 +677,6 @@
                 <h2>What is a <span>Net-Zero Energy Building?</span></h2>
             </div>
         </div>
-
         <div class="about-grid">
             <div class="about-card">
                 <h3>🏢 What is NZEB?</h3>
@@ -564,48 +686,23 @@
             <div class="about-card">
                 <h3>☀️ What is BIPV?</h3>
                 <p>Building-Integrated Photovoltaics (BIPV) are solar panels embedded directly into building elements — rooftops, facades, windows, and walls — replacing conventional building materials while generating clean electricity.</p>
-                <p>This system models BIPV on South, East, and West facades plus rooftop coverage of 700m² (70% of 1000m² roof area) using 18% efficient panels with a 0.8 performance ratio.</p>
+                <p>This system models BIPV on South, East, and West facades plus rooftop coverage using 18% efficient panels with a 0.8 performance ratio.</p>
             </div>
         </div>
-
         <div class="solar-imgs">
-            <div class="solar-img">
-                <img src="https://images.unsplash.com/photo-1497440001374-f26997328c1b?w=500&q=80" alt="Solar roof">
-            </div>
-            <div class="solar-img">
-                <img src="https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=500&q=80" alt="Solar facade">
-            </div>
-            <div class="solar-img">
-                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80" alt="Green building">
-            </div>
+            <div class="solar-img"><img src="https://images.unsplash.com/photo-1497440001374-f26997328c1b?w=500&q=80" alt="Solar roof"></div>
+            <div class="solar-img"><img src="https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=500&q=80" alt="Solar facade"></div>
+            <div class="solar-img"><img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80" alt="Green building"></div>
         </div>
-
         <div class="about-card" style="margin-bottom:24px">
             <h3>🎯 How to Achieve Net Zero in India</h3>
             <div class="nzeb-steps">
-                <div class="step-card">
-                    <div class="step-num">1</div>
-                    <h4>Reduce Demand</h4>
-                    <p>High-performance envelope, low-U glazing, shading devices, and efficient HVAC systems</p>
-                </div>
-                <div class="step-card">
-                    <div class="step-num">2</div>
-                    <h4>Generate Solar</h4>
-                    <p>Install BIPV on rooftop and South/West facades to maximize solar energy generation</p>
-                </div>
-                <div class="step-card">
-                    <div class="step-num">3</div>
-                    <h4>Store Energy</h4>
-                    <p>Battery storage systems to use solar energy during non-daylight hours</p>
-                </div>
-                <div class="step-card">
-                    <div class="step-num">4</div>
-                    <h4>Monitor & Optimize</h4>
-                    <p>Real-time monitoring and ML-based optimization to maintain Net Zero status</p>
-                </div>
+                <div class="step-card"><div class="step-num">1</div><h4>Reduce Demand</h4><p>High-performance envelope, low-U glazing, shading devices, and efficient HVAC systems</p></div>
+                <div class="step-card"><div class="step-num">2</div><h4>Generate Solar</h4><p>Install BIPV on rooftop and South/West facades to maximize solar energy generation</p></div>
+                <div class="step-card"><div class="step-num">3</div><h4>Store Energy</h4><p>Battery storage systems to use solar energy during non-daylight hours</p></div>
+                <div class="step-card"><div class="step-num">4</div><h4>Monitor & Optimize</h4><p>Real-time monitoring and ML-based optimization to maintain Net Zero status</p></div>
             </div>
         </div>
-
         <div class="about-card">
             <h3>🛠️ Technology Stack</h3>
             <div class="tech-grid">
@@ -658,16 +755,19 @@ async function predict() {
             ? `<span class="city-tag">📍 ${city} — ${geo.lat.toFixed(2)}°N, ${geo.lon.toFixed(2)}°E</span>`
             : `<span class="city-tag" style="color:#ff8c00">⚠️ Estimated location used</span>`;
 
+        const buildingArea = +document.getElementById("building_area").value || 1000;
+
         const data = {
             city, lat: geo.lat, lon: geo.lon,
-            month:           +document.getElementById("month").value,
-            day:             +document.getElementById("day").value,
-            hour:            +document.getElementById("hour").value,
-            temperature:     +document.getElementById("temperature").value,
-            humidity:        +document.getElementById("humidity").value,
-            solar_radiation: +document.getElementById("solar_radiation").value,
-            wind_speed:      +document.getElementById("wind_speed").value,
-            cloud_cover:     +document.getElementById("cloud_cover").value,
+            month:            +document.getElementById("month").value,
+            day:              +document.getElementById("day").value,
+            hour:             +document.getElementById("hour").value,
+            temperature:      +document.getElementById("temperature").value,
+            humidity:         +document.getElementById("humidity").value,
+            solar_radiation:  +document.getElementById("solar_radiation").value,
+            wind_speed:       +document.getElementById("wind_speed").value,
+            cloud_cover:      +document.getElementById("cloud_cover").value,
+            building_area_m2: buildingArea,
         };
 
         const res = await fetch("/predict", {
@@ -677,13 +777,15 @@ async function predict() {
         const r = await res.json();
         if (!r.success) { alert("Error: " + r.error); return; }
 
-        document.getElementById("rf_pred").textContent    = r.rf_pred       + " kWh/m²";
-        document.getElementById("bipv_wall").textContent  = (r.bipv_kwh_m2 * 0.75).toFixed(6) + " kWh/m²";
-        document.getElementById("bipv_roof").textContent  = (r.bipv_kwh_m2 * 0.25).toFixed(6) + " kWh/m²";
-        document.getElementById("bipv").textContent       = r.bipv_kwh_m2   + " kWh/m²";
-        document.getElementById("net_energy").textContent = r.net_energy     + " kWh/m²";
+        // ── Energy Metrics (show actual kWh/m²/year) ──
+        document.getElementById("rf_pred").textContent    = r.epi_actual + " kWh/m²/yr";
+        document.getElementById("bipv_wall").textContent  = (r.bipv_actual * 0.25).toFixed(2) + " kWh/m²/yr";
+        document.getElementById("bipv_roof").textContent  = (r.bipv_actual * 0.75).toFixed(2) + " kWh/m²/yr";
+        document.getElementById("bipv").textContent       = r.bipv_actual + " kWh/m²/yr";
+        document.getElementById("net_energy").textContent = r.net_epi_actual + " kWh/m²/yr";
         document.getElementById("energy_rating").innerHTML = `<span style="font-size:11px">${r.energy_rating}</span>`;
 
+        // ── Gauge ──
         const pct = r.nzeb_pct;
         const color = pct>=100?"#00c853":pct>=75?"#ffc800":pct>=50?"#ff8c00":"#ff5000";
         document.getElementById("gaugeArc").setAttribute("stroke-dasharray",`${(pct/100)*251} 251`);
@@ -692,14 +794,59 @@ async function predict() {
         document.getElementById("gaugePct").style.color = color;
 
         const bm = {green:"badge-green",yellow:"badge-yellow",orange:"badge-orange",red:"badge-red"};
-        document.getElementById("nzeb_badge").innerHTML = r.net_energy<=0
-            ? `<span class="badge badge-green">✅ Net Zero Achieved!</span>`
-            : `<span class="badge ${bm[r.status_color]||'badge-red'}">⚠️ ${pct.toFixed(1)}% toward Net Zero</span>`;
-
+        document.getElementById("nzeb_badge").innerHTML = r.net_epi_actual<=0
+    ? `<span class="badge badge-green">✅ Net Zero Achieved!</span>`
+    : `<span class="badge ${bm[r.status_color]||'badge-red'}">
+        ⚠️ ${pct.toFixed(1)}% now → 100% with ${r.panels ? r.panels.total_panels : '?'} panels
+       </span>`;
+        // ── Recommendation ──
         const recEl = document.getElementById("rec_box");
         recEl.className = `rec-box rec-${r.status_color}`;
         recEl.innerHTML = `<strong>💡 Recommendation:</strong><br>${r.recommendation}`;
 
+        // ── Panel Calculator ──
+        if (r.panels) {
+            const p = r.panels;
+
+            // KPIs
+            document.getElementById("totalPanels").textContent  = p.total_panels.toLocaleString();
+            document.getElementById("totalArea").textContent    = p.total_bipv_area_m2.toLocaleString();
+            document.getElementById("energyGen").textContent    = p.total_energy_gen_kwh.toLocaleString();
+            document.getElementById("solarHours").textContent   = p.peak_solar_hours;
+
+            // Rooftop
+            document.getElementById("rooftopPanels").textContent = p.rooftop_panels.toLocaleString();
+            document.getElementById("rooftopArea").textContent   = p.rooftop_area_m2 + " m²";
+            document.getElementById("rooftopEnergy").textContent = p.rooftop_energy_gen_kwh.toLocaleString() + " kWh/yr";
+
+            // Facade
+            document.getElementById("facadePanels").textContent  = p.facade_panels_total.toLocaleString();
+            document.getElementById("facadeArea").textContent    = p.facade_area_m2 + " m²";
+            document.getElementById("facadeEnergy").textContent  = p.facade_energy_gen_kwh.toLocaleString() + " kWh/yr";
+            document.getElementById("southPanels").textContent   = p.facade_south_panels;
+            document.getElementById("eastPanels").textContent    = p.facade_east_panels;
+            document.getElementById("westPanels").textContent    = p.facade_west_panels;
+
+            // NZEB result bar
+            const resultBar = document.getElementById("nzebResultBar");
+            if (p.nzeb_achieved) {
+                resultBar.className = "nzeb-result-bar nzeb-achieved";
+                resultBar.innerHTML = `✅ NZEB Achieved with ${p.total_panels} panels! Net EPI after solar: ${p.net_epi_after_kwh_m2} kWh/m²/yr`;
+            } else {
+                resultBar.className = "nzeb-result-bar nzeb-not-achieved";
+                resultBar.innerHTML = `⚠️ ${p.total_panels} panels cover most demand. Need ${p.extra_panels_needed} extra panels to fully achieve NZEB. Remaining deficit: ${p.nzeb_deficit_kwh_m2} kWh/m²/yr`;
+            }
+
+            // Status badge
+            document.getElementById("panelStatusBadge").textContent = p.nzeb_achieved ? "✅ NZEB Achievable" : "⚠️ Partial Coverage";
+            document.getElementById("panelStatusBadge").style.background = p.nzeb_achieved
+                ? "rgba(0,200,83,.2)" : "rgba(255,165,0,.2)";
+            document.getElementById("panelStatusBadge").style.color = p.nzeb_achieved ? "#00c853" : "#ffa500";
+            document.getElementById("panelStatusBadge").style.borderColor = p.nzeb_achieved
+                ? "rgba(0,200,83,.4)" : "rgba(255,165,0,.4)";
+        }
+
+        // ── Facade Chart ──
         if (facadeChartObj) facadeChartObj.destroy();
         facadeChartObj = new Chart(document.getElementById("facadeChart"), {
             type:"bar",
@@ -712,17 +859,52 @@ async function predict() {
             options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#8b949e"},grid:{color:"rgba(255,255,255,.05)"}},y:{ticks:{color:"#8b949e"},grid:{color:"rgba(255,255,255,.05)"},beginAtZero:true}}}
         });
 
+        // ── Monthly Chart — BIPV scaled ×8 for visibility ──
         if (monthlyChartObj) monthlyChartObj.destroy();
+        const bipvScaled = r.monthly_bipv.map(v => parseFloat((v * 8).toFixed(3)));
         monthlyChartObj = new Chart(document.getElementById("monthlyChart"), {
-            type:"bar",
-            data:{
-                labels:MONTHS,
-                datasets:[
-                    {label:"Energy (kWh/m²)",data:r.monthly_energy,backgroundColor:"rgba(255,80,80,.5)",borderColor:"#ff5050",borderWidth:1.5,borderRadius:4},
-                    {label:"BIPV Gen (kWh/m²)",data:r.monthly_bipv,backgroundColor:"rgba(0,200,83,.5)",borderColor:"#00c853",borderWidth:1.5,borderRadius:4}
+            type: "bar",
+            data: {
+                labels: MONTHS,
+                datasets: [
+                    {
+                        label: "Energy (kWh/m²/yr)",
+                        data: r.monthly_energy,
+                        backgroundColor: "rgba(255,80,80,.6)",
+                        borderColor: "#ff5050",
+                        borderWidth: 1.5,
+                        borderRadius: 4
+                    },
+                    {
+                        label: "BIPV Gen ×8 scaled",
+                        data: bipvScaled,
+                        backgroundColor: "rgba(0,200,83,.75)",
+                        borderColor: "#00c853",
+                        borderWidth: 1.5,
+                        borderRadius: 4
+                    }
                 ]
             },
-            options:{plugins:{legend:{labels:{color:"#8b949e",font:{size:11}}}},scales:{x:{ticks:{color:"#8b949e",font:{size:10}},grid:{color:"rgba(255,255,255,.05)"}},y:{ticks:{color:"#8b949e"},grid:{color:"rgba(255,255,255,.05)"},beginAtZero:true}}}
+            options: {
+                plugins: {
+                    legend: { labels: { color: "#8b949e", font: { size: 11 } } },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                if (ctx.datasetIndex === 1) {
+                                    const real = (ctx.raw / 8).toFixed(4);
+                                    return `BIPV Gen: ${real} kWh/m²/yr (×8 scaled for visibility)`;
+                                }
+                                return `Energy: ${ctx.raw} kWh/m²/yr`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { ticks: { color: "#8b949e", font: { size: 10 } }, grid: { color: "rgba(255,255,255,.05)" } },
+                    y: { ticks: { color: "#8b949e" }, grid: { color: "rgba(255,255,255,.05)" }, beginAtZero: true }
+                }
+            }
         });
 
         document.getElementById("pred-results").style.display = "block";
@@ -739,33 +921,20 @@ let resultsInited = false;
 function initResultCharts() {
     if (resultsInited) return;
     resultsInited = true;
-
     const gridColor = "rgba(255,255,255,.05)";
     const tickColor = "#8b949e";
 
-    // Model comparison
     new Chart(document.getElementById("modelCompareChart"), {
         type:"bar",
         data:{
             labels:["Random Forest","XGBoost","LSTM"],
-            datasets:[{
-                label:"R² Score",
-                data:[0.89, 0.85, 0.81],
-                backgroundColor:["rgba(0,212,255,.6)","rgba(0,200,83,.6)","rgba(255,165,0,.6)"],
-                borderColor:["#00d4ff","#00c853","#ffa500"],
-                borderWidth:1.5,borderRadius:8
-            }]
+            datasets:[{label:"R² Score",data:[0.89,0.85,0.81],
+            backgroundColor:["rgba(0,212,255,.6)","rgba(0,200,83,.6)","rgba(255,165,0,.6)"],
+            borderColor:["#00d4ff","#00c853","#ffa500"],borderWidth:1.5,borderRadius:8}]
         },
-        options:{
-            plugins:{legend:{display:false}},
-            scales:{
-                x:{ticks:{color:tickColor},grid:{color:gridColor}},
-                y:{ticks:{color:tickColor},grid:{color:gridColor},min:0.7,max:1.0}
-            }
-        }
+        options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:tickColor},grid:{color:gridColor}},y:{ticks:{color:tickColor},grid:{color:gridColor},min:0.7,max:1.0}}}
     });
 
-    // CV scores
     new Chart(document.getElementById("cvChart"), {
         type:"line",
         data:{
@@ -775,73 +944,29 @@ function initResultCharts() {
                 {label:"Test R²", data:[0.871,0.883,0.869,0.878,0.864],borderColor:"#00c853",backgroundColor:"rgba(0,200,83,.1)",tension:.4,fill:true,pointRadius:5}
             ]
         },
-        options:{
-            plugins:{legend:{labels:{color:tickColor}}},
-            scales:{
-                x:{ticks:{color:tickColor},grid:{color:gridColor}},
-                y:{ticks:{color:tickColor},grid:{color:gridColor},min:0.8,max:1.0}
-            }
-        }
+        options:{plugins:{legend:{labels:{color:tickColor}}},scales:{x:{ticks:{color:tickColor},grid:{color:gridColor}},y:{ticks:{color:tickColor},grid:{color:gridColor},min:0.8,max:1.0}}}
     });
 
-    // City R2
     new Chart(document.getElementById("cityR2Chart"), {
         type:"bar",
         data:{
             labels:["Mumbai","Delhi","Bengaluru","Chennai","Hyderabad","Kolkata","Pune","Ahmedabad","Jaipur","Lucknow","Guwahati","Chandigarh"],
-            datasets:[{
-                label:"R² Score",
-                data:[0.91,0.88,0.90,0.87,0.89,0.86,0.92,0.88,0.91,0.87,0.85,0.89],
-                backgroundColor:"rgba(0,212,255,.5)",borderColor:"#00d4ff",borderWidth:1.5,borderRadius:4
-            }]
+            datasets:[{label:"R² Score",data:[0.91,0.88,0.90,0.87,0.89,0.86,0.92,0.88,0.91,0.87,0.85,0.89],
+            backgroundColor:"rgba(0,212,255,.5)",borderColor:"#00d4ff",borderWidth:1.5,borderRadius:4}]
         },
-        options:{
-            plugins:{legend:{display:false}},
-            scales:{
-                x:{ticks:{color:tickColor,font:{size:9}},grid:{color:gridColor}},
-                y:{ticks:{color:tickColor},grid:{color:gridColor},min:0.8,max:1.0}
-            }
-        }
+        options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:tickColor,font:{size:9}},grid:{color:gridColor}},y:{ticks:{color:tickColor},grid:{color:gridColor},min:0.8,max:1.0}}}
     });
 
-    // Feature importance
     new Chart(document.getElementById("featureChart"), {
         type:"bar",
         data:{
             labels:["solar_radiation","temperature","hour","bipv_total_w","sin_hour","CDD","cloud_cover","heat_index","is_daytime","season"],
-            datasets:[{
-                label:"Importance",
-                data:[0.182,0.143,0.118,0.097,0.089,0.076,0.068,0.054,0.048,0.041],
-                backgroundColor:"rgba(0,200,83,.5)",borderColor:"#00c853",borderWidth:1.5,borderRadius:4
-            }]
+            datasets:[{label:"Importance",data:[0.182,0.143,0.118,0.097,0.089,0.076,0.068,0.054,0.048,0.041],
+            backgroundColor:"rgba(0,200,83,.5)",borderColor:"#00c853",borderWidth:1.5,borderRadius:4}]
         },
-        options:{
-            indexAxis:"y",
-            plugins:{legend:{display:false}},
-            scales:{
-                x:{ticks:{color:tickColor},grid:{color:gridColor}},
-                y:{ticks:{color:tickColor,font:{size:10}},grid:{color:gridColor}}
-            }
-        }
+        options:{indexAxis:"y",plugins:{legend:{display:false}},scales:{x:{ticks:{color:tickColor},grid:{color:gridColor}},y:{ticks:{color:tickColor,font:{size:10}},grid:{color:gridColor}}}}
     });
 }
 </script>
-<!-- FOOTER -->
-<footer style="background:rgba(255,255,255,0.04);border-top:1px solid #30363d;padding:30px 40px;text-align:center;margin-top:40px">
-    <div style="max-width:1200px;margin:0 auto">
-        <div style="font-size:18px;font-weight:700;color:#00d4ff;margin-bottom:8px">
-            🏢 NZEB Energy Prediction System
-        </div>
-        <div style="font-size:13px;color:#8b949e;margin-bottom:6px">
-            Data-Driven Modeling for Net-Zero Energy Buildings · Random Forest Model · R²=0.89 · 525,888 Records · 12 Indian Metrocities
-        </div>
-        <div style="font-size:13px;color:#8b949e;margin-bottom:6px">
-            Dataset: I-BLEND (IIT Bombay) · NASA POWER · BEE/ECBC Indian Energy Code
-        </div>
-        <div style="font-size:12px;color:#555;margin-top:10px">
-            © 2026 <strong style="color:#aaa">(RISHI LAB) IIT JODHPUR</strong> · All Rights Reserved
-        </div>
-    </div>
-</footer>
 </body>
 </html>

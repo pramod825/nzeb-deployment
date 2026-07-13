@@ -1,4 +1,4 @@
-# app.py - NZEB Flask Web Application (Updated)
+# app.py - NZEB Flask Web Application (Updated with Panel Calculator)
 from flask import Flask, request, jsonify, render_template
 import numpy as np
 import pandas as pd
@@ -63,6 +63,31 @@ print("City encoding loaded!")
 print("All models loaded successfully!")
 
 # -------------------------------------------------------
+# Panel calculator constants
+# -------------------------------------------------------
+PANEL_WATT      = 400   # W per standard solar panel
+PANEL_AREA_M2   = 2.0   # m² per panel
+SYSTEM_LOSSES   = 0.80  # inverter + wiring losses (80% efficiency)
+FACADE_FACTOR   = 0.60  # facade panels are 60% as efficient as rooftop
+
+# Peak solar hours per city (from NASA POWER data)
+CITY_SOLAR_HOURS = {
+    "Ahmedabad": 5.9, "Jaipur": 5.8, "Chennai": 5.8,
+    "Hyderabad": 5.7, "Bengaluru": 5.6, "Mumbai": 5.5,
+    "Pune": 5.4, "Delhi": 5.3, "Lucknow": 5.1,
+    "Chandigarh": 5.0, "Kolkata": 4.8, "Guwahati": 4.5,
+}
+
+# BEE EPI benchmarks (kWh/m²/year) for commercial buildings
+BEE_BENCHMARKS = {
+    5: {"label": "⭐⭐⭐⭐⭐ BEE 5-Star (Near NZEB)",        "max_epi": 60},
+    4: {"label": "⭐⭐⭐⭐ BEE 4-Star (Highly Efficient)",   "max_epi": 90},
+    3: {"label": "⭐⭐⭐ BEE 3-Star (Moderately Efficient)", "max_epi": 120},
+    2: {"label": "⭐⭐ BEE 2-Star (Below Average)",          "max_epi": 150},
+    1: {"label": "⭐ BEE 1-Star (Poor Performance)",         "max_epi": 9999},
+}
+
+# -------------------------------------------------------
 # India climate zone lookup by lat/lon
 # -------------------------------------------------------
 def get_climate_zone(lat, lon):
@@ -106,6 +131,106 @@ def get_city_info(city_name, lat, lon):
     return city_name, estimated_info, nearest_city
 
 # -------------------------------------------------------
+# Panel calculator function
+# -------------------------------------------------------
+def calculate_panels(city_name, nearest_city, epi_actual, building_area_m2, lat, lon):
+    """
+    Calculate number of solar panels needed on rooftop and facade to achieve NZEB.
+
+    Parameters:
+        city_name       : user input city name
+        nearest_city    : nearest known city (for solar hours lookup)
+        epi_actual      : actual EPI in kWh/m²/year (normalized × 200)
+        building_area_m2: total building floor area in m²
+        lat, lon        : coordinates for fallback solar hours estimation
+
+    Returns:
+        dict with full panel breakdown
+    """
+    # Get peak solar hours — try exact match, then nearest city, then estimate from lat
+    psh = CITY_SOLAR_HOURS.get(city_name,
+          CITY_SOLAR_HOURS.get(nearest_city,
+          6.0 - abs(lat - 20) * 0.05))   # rough fallback: decreases away from equator
+    psh = max(3.5, min(7.0, psh))         # clamp to realistic range
+
+    # Annual energy generated per panel (kWh/year)
+    energy_per_panel_kwh = (PANEL_WATT / 1000) * psh * 365 * SYSTEM_LOSSES
+
+    # Total annual energy demand of building
+    total_energy_demand_kwh = epi_actual * building_area_m2
+
+    # ── Rooftop panels (covers 70% of demand) ─────────────────
+    rooftop_energy_needed = total_energy_demand_kwh * 0.70
+    rooftop_panels        = int(np.ceil(rooftop_energy_needed / energy_per_panel_kwh))
+    rooftop_area_m2       = round(rooftop_panels * PANEL_AREA_M2, 1)
+    rooftop_energy_gen    = round(rooftop_panels * energy_per_panel_kwh, 1)
+
+    # ── Facade panels (covers 30% of demand, lower efficiency) ─
+    facade_energy_needed  = total_energy_demand_kwh * 0.30
+    facade_panels_total   = int(np.ceil(
+        facade_energy_needed / (energy_per_panel_kwh * FACADE_FACTOR)
+    ))
+
+    # Split facade panels by direction (South gets most sun in India)
+    facade_south = int(np.ceil(facade_panels_total * 0.50))
+    facade_east  = int(np.ceil(facade_panels_total * 0.25))
+    facade_west  = int(np.ceil(facade_panels_total * 0.25))
+    facade_area_m2 = round(facade_panels_total * PANEL_AREA_M2, 1)
+    facade_energy_gen = round(
+        facade_panels_total * energy_per_panel_kwh * FACADE_FACTOR, 1
+    )
+
+    # ── Totals ─────────────────────────────────────────────────
+    total_panels      = rooftop_panels + facade_panels_total
+    total_bipv_area   = round(rooftop_area_m2 + facade_area_m2, 1)
+    total_energy_gen  = round(rooftop_energy_gen + facade_energy_gen, 1)
+    net_epi_after     = round(epi_actual - (total_energy_gen / building_area_m2), 2)
+    nzeb_achieved     = net_epi_after <= 0
+    nzeb_deficit      = round(max(0, net_epi_after), 2)
+
+    # Extra panels needed if NZEB not achieved
+    extra_panels = 0
+    if not nzeb_achieved:
+        extra_energy_needed = nzeb_deficit * building_area_m2
+        extra_panels = int(np.ceil(extra_energy_needed / energy_per_panel_kwh))
+
+    return {
+        # Building info
+        "building_area_m2":       building_area_m2,
+        "epi_actual":             round(epi_actual, 2),
+        "total_energy_demand_kwh": round(total_energy_demand_kwh, 1),
+        "peak_solar_hours":       round(psh, 1),
+        "energy_per_panel_kwh":   round(energy_per_panel_kwh, 1),
+
+        # Rooftop
+        "rooftop_panels":         rooftop_panels,
+        "rooftop_area_m2":        rooftop_area_m2,
+        "rooftop_energy_gen_kwh": rooftop_energy_gen,
+
+        # Facade
+        "facade_panels_total":    facade_panels_total,
+        "facade_south_panels":    facade_south,
+        "facade_east_panels":     facade_east,
+        "facade_west_panels":     facade_west,
+        "facade_area_m2":         facade_area_m2,
+        "facade_energy_gen_kwh":  facade_energy_gen,
+
+        # Totals
+        "total_panels":           total_panels,
+        "total_bipv_area_m2":     total_bipv_area,
+        "total_energy_gen_kwh":   total_energy_gen,
+        "net_epi_after_kwh_m2":   net_epi_after,
+        "nzeb_achieved":          nzeb_achieved,
+        "nzeb_deficit_kwh_m2":    nzeb_deficit,
+        "extra_panels_needed":    extra_panels,
+
+        # Panel specs
+        "panel_watt":             PANEL_WATT,
+        "panel_area_m2":          PANEL_AREA_M2,
+        "system_losses_pct":      int(SYSTEM_LOSSES * 100),
+    }
+
+# -------------------------------------------------------
 # Feature calculation
 # -------------------------------------------------------
 def calculate_features(city_name, lat, lon, month, day, hour,
@@ -146,6 +271,19 @@ def calculate_features(city_name, lat, lon, month, day, hour,
         )
         val = float(np.array(poa["poa_global"]).flatten()[0])
         facade_radiation[wall_name] = max(0.0, float(np.nan_to_num(val)))
+
+    # Fix facade radiation — at solar noon South must be highest in India
+    # pvlib overestimates diffuse on East/West; apply correction
+    hour_angle = (hour - 12) * 15
+    if is_daytime:
+        if hour_angle <= 0:
+            # Morning/noon — reduce West
+            facade_radiation["west"] = facade_radiation["west"] * 0.65
+        else:
+            # Afternoon — reduce East
+            facade_radiation["east"] = facade_radiation["east"] * 0.65
+        # South always boosted slightly for Indian latitudes
+        facade_radiation["south"] = facade_radiation["south"] * 1.05
 
     eff = float(building["bipv_efficiency"])
     pr  = float(building["bipv_pr"])
@@ -214,7 +352,7 @@ def calculate_features(city_name, lat, lon, month, day, hour,
         "humidity_temp_interaction": humidity * temperature / 100,
         "cdd_solar_interaction": cdd * solar_radiation / 1000,
     }
-    return input_data, facade_radiation, bipv_m2, info
+    return input_data, facade_radiation, bipv_m2, info, nearest_city
 
 # -------------------------------------------------------
 # Monthly chart data generator
@@ -232,14 +370,15 @@ def get_monthly_data(city_name, lat, lon, temperature, humidity,
         try:
             t  = temperature + temp_adj[i]
             sr = solar_radiation * solar_adj[i]
-            input_data, _, bm2, _ = calculate_features(
+            input_data, _, bm2, _, _ = calculate_features(
                 city_name, lat, lon, m, 15, 14, t, humidity, sr, wind_speed, cloud_cover
             )
             df     = pd.DataFrame([input_data])[feature_cols]
             scaled = scaler.transform(df)
             pred   = float(rf_model.predict(scaled)[0])
-            energy_vals.append(round(pred, 4))
-            bipv_vals.append(round(bm2, 4))
+            # Convert to actual EPI for monthly chart
+            energy_vals.append(round(pred * 200, 2))
+            bipv_vals.append(round(bm2 * 200, 2))
         except:
             energy_vals.append(0)
             bipv_vals.append(0)
@@ -270,7 +409,11 @@ def predict():
         wind_speed      = float(data["wind_speed"])
         cloud_cover     = float(data["cloud_cover"])
 
-        input_data, facade_rad, bipv_m2, info = calculate_features(
+        # Optional building area from frontend (default 1000 m²)
+        building_area_m2 = float(data.get("building_area_m2",
+                           float(building.get("total_area", 1000))))
+
+        input_data, facade_rad, bipv_m2, info, nearest_city = calculate_features(
             city_name, lat, lon, month, day, hour,
             temperature, humidity, solar_radiation, wind_speed, cloud_cover
         )
@@ -278,33 +421,58 @@ def predict():
         df           = pd.DataFrame([input_data])[feature_cols]
         input_scaled = scaler.transform(df)
         rf_pred      = float(rf_model.predict(input_scaled)[0])
-        net_energy   = rf_pred - bipv_m2
 
-        nzeb_pct = min(100, max(0, (bipv_m2 / rf_pred * 100) if rf_pred > 0 else 100))
-        if net_energy <= 0:
-            recommendation = "Net Zero Achieved! Your building generates enough solar energy to cover its consumption."
-            status_color   = "green"
-        elif nzeb_pct >= 75:
-            recommendation = "Almost there! You are 75%+ toward Net Zero. Add 25% more BIPV panels on South/West facade."
-            status_color   = "yellow"
-        elif nzeb_pct >= 50:
-            recommendation = "Halfway to Net Zero. Increase BIPV coverage, improve window glazing, and add roof insulation."
-            status_color   = "orange"
+        # ── Convert to actual EPI ──────────────────────────────
+        epi_actual    = rf_pred * 200          # kWh/m²/year
+        bipv_actual   = bipv_m2 * 200          # kWh/m²/year
+        net_energy    = rf_pred - bipv_m2      # normalized
+        net_epi_actual = epi_actual - bipv_actual  # kWh/m²/year
+
+        # ── NZEB progress ──────────────────────────────────────
+        nzeb_pct = min(100, max(0,
+            (bipv_actual / epi_actual * 100) if epi_actual > 0 else 100
+        ))
+
+        # ── BEE Star Rating ────────────────────────────────────
+        if epi_actual < 60:
+            rating    = "⭐⭐⭐⭐⭐ BEE 5-Star (Near NZEB)"
+            bee_stars = 5
+        elif epi_actual < 90:
+            rating    = "⭐⭐⭐⭐ BEE 4-Star (Highly Efficient)"
+            bee_stars = 4
+        elif epi_actual < 120:
+            rating    = "⭐⭐⭐ BEE 3-Star (Moderately Efficient)"
+            bee_stars = 3
+        elif epi_actual < 150:
+            rating    = "⭐⭐ BEE 2-Star (Below Average)"
+            bee_stars = 2
         else:
-            recommendation = "High energy gap. Major improvements needed: expand BIPV system, upgrade HVAC efficiency."
-            status_color   = "red"
+            rating    = "⭐ BEE 1-Star (Poor Performance)"
+            bee_stars = 1
 
-        if rf_pred < 0.05:
-            rating = "Excellent (Very Low Energy)"
-        elif rf_pred < 0.10:
-            rating = "Good (Low Energy)"
-        elif rf_pred < 0.15:
-            rating = "Moderate Energy"
-        elif rf_pred < 0.20:
-            rating = "High Energy"
+        # ── Panel Calculator ───────────────────────────────────
+        panel_data = calculate_panels(
+            city_name, nearest_city,
+            epi_actual, building_area_m2,
+            lat, lon
+        )
+            # ── Recommendation ─────────────────────────────────────
+        p = panel_data  # already calculated above
+
+        if net_epi_actual <= 0:
+            recommendation = f"✅ Net Zero Already Achieved! Building generates more than it consumes."
+            status_color = "green"
+        elif epi_actual < 60:
+            recommendation = f"⭐ BEE 5-Star building! Install {p['total_panels']} panels ({p['rooftop_panels']} rooftop + {p['facade_panels_total']} facade) to fully achieve NZEB. Net EPI after panels: {p['net_epi_after_kwh_m2']} kWh/m²/yr"
+            status_color = "yellow"
+        elif epi_actual < 90:
+            recommendation = f"🔷 BEE 4-Star building. Install {p['total_panels']} panels ({p['rooftop_panels']} rooftop + {p['facade_panels_total']} facade) to achieve NZEB."
+            status_color = "orange"
         else:
-            rating = "Very High Energy"
-
+            recommendation = f"🔴 High energy demand. Install {p['total_panels']} panels + upgrade HVAC and insulation to approach NZEB."
+            status_color = "red"
+            
+        # ── Monthly chart data ─────────────────────────────────
         monthly_energy, monthly_bipv = get_monthly_data(
             city_name, lat, lon, temperature, humidity,
             solar_radiation, wind_speed, cloud_cover
@@ -313,25 +481,51 @@ def predict():
         return jsonify({
             "success":        True,
             "city":           city_name,
+
+            # Raw model output
             "rf_pred":        round(rf_pred, 6),
             "bipv_kwh_m2":    round(bipv_m2, 6),
             "net_energy":     round(net_energy, 6),
+
+            # Actual EPI values (kWh/m²/year)
+            "epi_actual":     round(epi_actual, 2),
+            "bipv_actual":    round(bipv_actual, 2),
+            "net_epi_actual": round(net_epi_actual, 2),
+            "epi_unit":       "kWh/m²/year",
+
+            # NZEB progress
             "nzeb_pct":       round(nzeb_pct, 1),
+
+            # BEE Rating
             "energy_rating":  rating,
+            "bee_stars":      bee_stars,
+
+            # Recommendation
             "recommendation": recommendation,
             "status_color":   status_color,
+
+            # Facade radiation
             "facade_north":   round(facade_rad["north"], 2),
             "facade_south":   round(facade_rad["south"], 2),
             "facade_east":    round(facade_rad["east"],  2),
             "facade_west":    round(facade_rad["west"],  2),
-            "climate_zone":   info["zone_name"] if isinstance(info.get("zone_name"), str) else str(info.get("climate_zone", "")),
+
+            # Climate info
+            "climate_zone":   info["zone_name"] if isinstance(
+                              info.get("zone_name"), str) else str(info.get("climate_zone", "")),
+
+            # Monthly chart
             "monthly_energy": monthly_energy,
             "monthly_bipv":   monthly_bipv,
+
+            # Panel calculator results
+            "panels": panel_data,
         })
 
     except Exception as e:
         import traceback
-        return jsonify({"success": False, "error": str(e), "trace": traceback.format_exc()})
+        return jsonify({"success": False, "error": str(e),
+                        "trace": traceback.format_exc()})
 
 
 @app.route("/geocode", methods=["POST"])
@@ -388,7 +582,12 @@ def geocode():
 
 @app.route("/health")
 def health():
-    return jsonify({"status": "healthy", "models": "loaded", "cities": len(cities), "features": len(feature_cols)})
+    return jsonify({
+        "status": "healthy",
+        "models": "loaded",
+        "cities": len(cities),
+        "features": len(feature_cols)
+    })
 
 
 if __name__ == "__main__":
