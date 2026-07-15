@@ -7,4 +7,3 @@ pvlib==0.10.5
 gunicorn==22.0.0
 gdown==5.2.0
 tensorflow-cpu==2.13.0
-
