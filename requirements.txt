@@ -1,8 +1,10 @@
-flask
-numpy
-pandas
+cat > ~/Desktop/NZEB_Deployment/requirements.txt << 'EOF'
+flask==3.0.3
+numpy==1.26.4
+pandas==2.2.2
 scikit-learn==1.6.1
-xgboost
-pvlib
-gunicorn
-gdown
+xgboost==2.0.3
+pvlib==0.10.5
+gunicorn==22.0.0
+gdown==5.2.0
+EOF
