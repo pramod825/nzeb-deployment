@@ -1,4 +1,3 @@
-cat > ~/Desktop/NZEB_Deployment/requirements.txt << 'EOF'
 flask==3.0.3
 numpy==1.26.4
 pandas==2.2.2
