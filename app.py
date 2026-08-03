@@ -422,10 +422,12 @@ def predict():
         input_scaled = scaler.transform(df)
         rf_pred      = float(rf_model.predict(input_scaled)[0])
 
-        # ── Convert to actual EPI ──────────────────────────────
-        epi_actual    = rf_pred * 200          # kWh/m²/year
-        bipv_actual   = bipv_m2 * 200          # kWh/m²/year
-        net_energy    = rf_pred - bipv_m2      # normalized
+        # ── Convert m²/year
+        net_energy    = rf_pred - bipv_m2      # normalizedto actual EPI ──────────────────────────────
+        epi_actual, bipv_actual = calculate_annual_epi(
+        city_name, lat, lon, temperature, humidity,
+        solar_radiation, wind_speed, cloud_cover
+)
         net_epi_actual = epi_actual - bipv_actual  # kWh/m²/year
 
         # ── NZEB progress ──────────────────────────────────────
