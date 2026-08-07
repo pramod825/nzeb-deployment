@@ -277,13 +277,12 @@ def calculate_features(city_name, lat, lon, month, day, hour,
     hour_angle = (hour - 12) * 15
     if is_daytime:
         if hour_angle <= 0:
-            # Morning/noon — reduce West
             facade_radiation["west"] = facade_radiation["west"] * 0.65
         else:
-            # Afternoon — reduce East
             facade_radiation["east"] = facade_radiation["east"] * 0.65
-        # South always boosted slightly for Indian latitudes
         facade_radiation["south"] = facade_radiation["south"] * 1.05
+        # North gets almost no direct sun in India — cap to diffuse-only levels
+        facade_radiation["north"] = min(facade_radiation["north"] * 0.15, 80.0)
 
     eff = float(building["bipv_efficiency"])
     pr  = float(building["bipv_pr"])
@@ -363,8 +362,10 @@ def get_monthly_data(city_name, lat, lon, temperature, humidity,
     energy_vals = []
     bipv_vals   = []
 
+    city_psh   = CITY_SOLAR_HOURS.get(city_name, 5.5)
+    scale      = city_psh / 5.5
     temp_adj   = [0,-2,-1,2,6,4,2,1,0,-1,-2,-1]
-    solar_adj  = [0.7,0.8,0.9,1.0,1.0,0.8,0.7,0.7,0.85,0.9,0.8,0.7]
+    solar_adj  = [v * scale for v in [0.7,0.8,0.9,1.0,1.0,0.8,0.7,0.7,0.85,0.9,0.8,0.7]]
 
     for i, m in enumerate(months):
         try:
