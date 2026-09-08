@@ -25,10 +25,10 @@ RF_MODEL_PATH = os.path.join(MODEL_DIR, "random_forest_model.pkl")
 if not os.path.exists(RF_MODEL_PATH):
     print("Downloading RF model from Google Drive...")
     gdown.download(
-        "https://drive.google.com/uc?id=1UVuZd1qxsksb0QAxKAI-g-PlazbSXWyX",
-        RF_MODEL_PATH,
-        quiet=False
-    )
+    "https://drive.google.com/uc?id=1kfbtbv2VVou-XjOq7bVq8-GJRVS_BmEF",
+    RF_MODEL_PATH,
+    quiet=False
+)
     print("RF model downloaded!")
 
 # -------------------------------------------------------
