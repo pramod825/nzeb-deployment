@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify, render_template
 import numpy as np
 import pandas as pd
 import pickle
+import joblib
 import json
 import pvlib
 import os
@@ -25,27 +26,27 @@ RF_MODEL_PATH = os.path.join(MODEL_DIR, "random_forest_model.pkl")
 if not os.path.exists(RF_MODEL_PATH):
     print("Downloading RF model from Google Drive...")
     gdown.download(
-    "https://drive.google.com/uc?id=1kfbtbv2VVou-XjOq7bVq8-GJRVS_BmEF",
-    RF_MODEL_PATH,
-    quiet=False
-)
+        "https://drive.google.com/uc?id=1kfbtbv2VVou-XjOq7bVq8-GJRVS_BmEF",
+        RF_MODEL_PATH,
+        quiet=False,
+        fuzzy=True
+    )
     print("RF model downloaded!")
+    print(f"Downloaded file size: {os.path.getsize(RF_MODEL_PATH) / (1024*1024):.2f} MB")
 
 # -------------------------------------------------------
 # Load all models and files at startup
 # -------------------------------------------------------
 print("Loading models...")
 
-with open(os.path.join(MODEL_DIR, "random_forest_model.pkl"), "rb") as f:
-    rf_model = pickle.load(f)
+rf_model = joblib.load(os.path.join(MODEL_DIR, "random_forest_model.pkl"))
 print("RF model loaded!")
 
-with open(os.path.join(MODEL_DIR, "scaler.pkl"), "rb") as f:
-    scaler = pickle.load(f)
+scaler = joblib.load(os.path.join(MODEL_DIR, "scaler.pkl"))
 print("Scaler loaded!")
 
 with open(os.path.join(MODEL_DIR, "feature_cols.pkl"), "rb") as f:
-    feature_cols = pickle.load(f)
+    feature_cols = joblib.load(os.path.join(MODEL_DIR, "feature_cols.pkl"))
 print(f"Feature cols loaded! ({len(feature_cols)} features)")
 
 with open(os.path.join(MODEL_DIR, "cities.json"), "r") as f:
