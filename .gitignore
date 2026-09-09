@@ -4,3 +4,4 @@ __pycache__/
 .env
 *.DS_Store
 models/lstm_model.keras
+models/random_forest_model.pkl
