@@ -22,7 +22,8 @@ MODEL_DIR = os.path.join(BASE_DIR, "models")
 os.makedirs(MODEL_DIR, exist_ok=True)
 
 RF_MODEL_PATH = os.path.join(MODEL_DIR, "random_forest_model.pkl")
-
+if os.path.exists(RF_MODEL_PATH):
+    os.remove(RF_MODEL_PATH)
 if not os.path.exists(RF_MODEL_PATH):
     print("Downloading RF model from Google Drive...")
     gdown.download(
@@ -32,7 +33,6 @@ if not os.path.exists(RF_MODEL_PATH):
         fuzzy=True
     )
     print("RF model downloaded!")
-    print(f"Downloaded file size: {os.path.getsize(RF_MODEL_PATH) / (1024*1024):.2f} MB")
 
 # -------------------------------------------------------
 # Load all models and files at startup
