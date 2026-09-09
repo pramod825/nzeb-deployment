@@ -1,15 +1,6 @@
-# Large model files
-models/random_forest_model.pkl
-models/rf_model.pkl
-
-# Python cache
 __pycache__/
 *.pyc
 *.pyo
 .env
-*.DS_Storemodels/random_forest_model.pkl
-models/random_forest_model.pkl
+*.DS_Store
 models/lstm_model.keras
-models/xgboost_model.pkl
-models/random_forest_model.pkl
-models/random_forest_model.pkl
